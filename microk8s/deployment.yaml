@@ -1,5 +1,0 @@
----
-- name: Deploying micro8s HA
-  hosts: microk8s_HA
-  roles:
-    - micro8s

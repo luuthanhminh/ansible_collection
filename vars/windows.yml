@@ -1,0 +1,9 @@
+clone_id: 9003
+
+proxmox_core: 4
+
+proxmox_memory: 4096
+
+disk_size: 64
+
+remote_tmp: C:\Users\Administrator\tmp

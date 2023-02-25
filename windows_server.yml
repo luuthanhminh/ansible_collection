@@ -1,0 +1,36 @@
+- hosts: localhost
+  connection: local
+  vars_files:
+    - ./vars/windows.yml
+  vars:
+      - proxmox_creation: false
+      - proxmox_hostname: Windows-{{'%d-%b'| strftime(ansible_date_time.epoch)}}
+  roles:
+      - { role: proxmox, when: proxmox_creation == 'true' }
+
+- hosts: proxmox_hosts
+  gather_facts: true
+  vars_files:
+    - ./vars/windows.yml
+  tasks:
+    - block:
+        - set_fact:
+            rdp_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits') }}"
+            rdp_user: "{{ to_email | regex_search('([^@]+)') }}"
+        - debug:
+            msg: "{{ rdp_password }}"
+        - name: Create new rdp user
+          win_user:
+            name: "{{ rdp_user }}"
+            password: " {{ rdp_password }}"
+            groups:
+              - Administrators
+              - Remote Desktop Users
+            update_password: always
+            password_never_expires: yes
+        - debug:
+            msg: "{{ rdp_user}} is {{ rdp_password }}"
+      rescue:
+        - name: Error handling task
+          debug:
+            msg: "Windows"
